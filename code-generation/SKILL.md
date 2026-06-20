@@ -29,6 +29,16 @@ Consider blast radius: prefer the smallest change that correctly solves the prob
 
 ---
 
+## Keep changes self-contained and small
+
+Each piece of code generated should do one thing. If the user asks for a large feature, think about the natural seams — what's a working, shippable increment versus what's the whole thing at once? When it makes sense, say so: "I'll implement the data model and its tests first; the API layer can come next so each piece is reviewable on its own."
+
+Don't fold refactoring into a feature change silently. If you're also cleaning up something unrelated while implementing what was asked, call it out clearly — either as a separate block, or with a comment marking it as a distinct cleanup — so the user can see what's a behavior change and what's housekeeping.
+
+When producing tests, include them in the same output as the code they cover, not as an afterthought. A function and its tests belong together.
+
+---
+
 ## Complexity
 
 Simpler is better. If two approaches solve the problem, choose the one that is easier to read.
@@ -65,6 +75,22 @@ Bad comment: `// Increment i by 1`
 Don't leave commented-out code blocks. Either keep the code or delete it — version control preserves history.
 
 Document public functions, classes, and modules using the idiom of the language (docstrings, Javadoc, doc comments, etc). Describe what it does, its parameters, its return value, and any edge cases worth flagging.
+
+---
+
+## Documentation
+
+If the code being written or changed alters a public API, a CLI interface, configuration options, or the way something is built, tested, or deployed: update the relevant documentation too. This means README sections, docstrings, inline usage examples, or whatever the project uses. Don't generate a behavior change and leave the docs describing the old behavior. If there's no existing documentation to update but the new code warrants it, add a minimal docstring or usage note.
+
+---
+
+## Commit and PR descriptions
+
+When asked to write a commit message or PR/CL description alongside code, apply the same rigor:
+
+- **First line**: a short, specific summary of *what* the change does, written as an imperative sentence ("Add retry logic to the payment client", not "Added retry logic" or "Retry logic"). It should stand alone — someone reading git log should understand the change without opening the diff.
+- **Body**: explain *why* the change is being made. What problem does it solve? What did you decide and why? Are there any tradeoffs or known shortcomings? Include relevant context (bug numbers, links to design docs, benchmark results) when that context will help a future reader.
+- Avoid vague descriptions like "Fix bug", "Add patch", "Refactor", or "Phase 1" — these communicate nothing useful to someone searching history later.
 
 ---
 
