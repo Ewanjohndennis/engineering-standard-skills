@@ -5,7 +5,7 @@
 > **Instructions for setup**: fill in the sections below. Delete any section that genuinely doesn't apply. Don't leave placeholder text in place — an absent section is better than a wrong one.
 
 ---
-
+ 
 ## Project overview
 
 <!-- One paragraph: what this project does, who uses it, and what "working correctly" means in plain terms. -->

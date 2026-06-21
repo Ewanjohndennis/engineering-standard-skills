@@ -38,7 +38,7 @@ If a single task spans multiple languages (e.g. a Python backend with embedded S
 ---
  
 ## Priority order across all layers
-
+ 
 When guidance from different reference files conflicts, resolve it in this order:
 
 1. **Correctness**
