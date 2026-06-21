@@ -1,11 +1,7 @@
----
-name: c-standards
-description: Apply C-specific engineering standards when writing, reviewing, refactoring, or debugging C code. Use alongside code-generation-standards and code-review-standards — this skill adds C idioms, memory safety discipline, and language-specific pitfalls that the generic skills can't cover. Triggers on any C file, function, struct definition, or snippet. Applies to C99/C11 unless the project targets a specific standard.
----
 
 # C Standards
 
-> Language-specific standards for C. Apply on top of the generic code-generation-standards and code-review-standards skills — this narrows them to C idioms, memory safety, undefined behavior, and systems-level pitfalls. Defaults to C11 unless the project specifies otherwise.
+> Language-specific standards for C. Apply on top of the generic code-generation and code-review standards — this narrows them to C idioms, memory safety, undefined behavior, and systems-level pitfalls. Defaults to C11 unless the project specifies otherwise.
 
 ---
 

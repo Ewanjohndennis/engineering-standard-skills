@@ -1,7 +1,3 @@
----
-name: calibration
-description: Ask one targeted calibration question before starting a code review or beginning a significant code generation task, to tailor output to the actual situation rather than a generic bar. Use at the start of any session where the user shares code for review, asks Claude to build a feature, or requests a refactor — before producing the review or the code. Do not use for quick one-off questions, bug fixes under ten lines, or when the user has already provided explicit context about the situation.
----
 
 # Calibration
 

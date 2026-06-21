@@ -1,11 +1,7 @@
----
-name: python-standards
-description: Apply Python-specific engineering standards when writing, reviewing, refactoring, or debugging Python code. Use alongside code-generation-standards and code-review-standards — this skill adds Python idioms, ecosystem norms, and language-specific pitfalls that the generic skills can't cover. Triggers on any Python file, function, class, or snippet.
----
 
 # Python Standards
 
-> Language-specific standards for Python. Apply on top of the generic code-generation-standards and code-review-standards skills — this narrows them to Python idioms and common Python pitfalls.
+> Language-specific standards for Python. Apply on top of the generic code-generation and code-review standards — this narrows them to Python idioms and common Python pitfalls.
 
 ---
 

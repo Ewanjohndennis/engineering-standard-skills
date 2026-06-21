@@ -1,7 +1,3 @@
----
-name: code-generation-standards
-description: Apply rigorous engineering standards when writing, generating, refactoring, or debugging code. Use whenever the user asks Claude to write a function, build a feature, refactor existing code, fix a bug, or add tests. Even for casual requests ("write me a function that..."), apply these standards silently — don't announce it, just produce code that meets this bar.
----
 
 # Code Generation Standards
 
@@ -11,9 +7,38 @@ When writing or modifying any code, internalize and apply the following standard
 
 ---
 
+## Priority order
+
+These standards can pull in different directions — "match the existing codebase" and "use modern idioms" aren't always compatible; neither are "don't over-engineer" and "design for the future." When two principles in this file genuinely conflict, resolve it in this order:
+
+1. **Correctness** — the code must do what it's supposed to do.
+2. **Security** — never trade safety for elegance or speed.
+3. **Existing codebase conventions** — consistency beats a theoretically better pattern.
+4. **Maintainability** — will this be easy to change safely later?
+5. **Readability** — will another engineer understand this quickly?
+6. **Performance** — fast, but only after the above are satisfied.
+7. **Style preferences** — the least important axis; never worth a real tradeoff elsewhere.
+
+Never sacrifice a higher-priority concern to satisfy a lower-priority one. If a request seems to require that tradeoff, say so explicitly rather than silently picking one side.
+
+---
+
 ## Match the existing codebase first
 
 Before applying any naming or style rule below: look at the surrounding code. If the project already has a convention (casing style, file layout, error-handling pattern, test framework), follow that convention even if it differs from the defaults here. These defaults are a fallback for greenfield code or when no convention exists yet — they are not meant to override an established codebase's style.
+
+---
+
+## Confidence
+
+Do not invent APIs, framework features, library methods, or version-specific behavior. If you're not certain a method, parameter, or behavior actually exists in the library/version being used, say so explicitly rather than presenting a guess as fact. A confident-sounding hallucinated import is worse than an honest "I'm not certain this exists in this version — worth double-checking the docs."
+
+When uncertain:
+- State the uncertainty plainly rather than hedging vaguely.
+- Ask for the specific library/framework version if it would resolve the ambiguity.
+- Prefer documented, stable APIs over obscure ones you're recalling from memory with low confidence.
+
+This matters more than it sounds: code that compiles but calls a method that doesn't exist, or that quietly relies on behavior that changed between versions, is more dangerous than code that's missing a feature, because it fails later and less obviously.
 
 ---
 
@@ -36,6 +61,10 @@ Each piece of code generated should do one thing. If the user asks for a large f
 Don't fold refactoring into a feature change silently. If you're also cleaning up something unrelated while implementing what was asked, call it out clearly — either as a separate block, or with a comment marking it as a distinct cleanup — so the user can see what's a behavior change and what's housekeeping.
 
 When producing tests, include them in the same output as the code they cover, not as an afterthought. A function and its tests belong together.
+
+### When not to refactor
+
+Don't refactor code solely because it could be marginally cleaner. Refactor when you're fixing a bug, adding a feature, removing real duplication, or directly improving maintainability of code you're already touching for another reason. Avoid large, unrelated rewrites — if a file could be improved but nothing about the current task requires it, mention it briefly and move on rather than rewriting it unprompted.
 
 ---
 
@@ -103,7 +132,14 @@ Write testable code by default. This means:
 
 When writing test code, each test should verify one behavior. Test names should describe the scenario being tested (`test_returns_empty_list_when_no_users_found`, not `test_users`).
 
-Cover the important cases: happy path, edge cases (empty input, zero, None/null), and error cases. Don't write tests just to hit a coverage number — write tests that would catch real bugs.
+Prioritize test coverage in this order when you can't cover everything equally:
+1. Critical business logic — the code where a bug actually costs something.
+2. Edge cases — empty input, zero, None/null, boundary values.
+3. Error paths — does it fail the way it's supposed to?
+4. Integration points — boundaries with external systems, other modules.
+5. Happy paths — the straightforward case, last, since it's also the one most likely to already work.
+
+Don't write tests just to hit a coverage number — write tests that would catch real bugs. Avoid snapshot-heavy tests that just freeze current output without asserting anything meaningful, and avoid mocking everything in a unit test to the point that the test only verifies the mocks were called.
 
 Don't test implementation details. Test observable behavior. If you can refactor the internals without changing the tests, the tests are well-designed.
 
@@ -126,6 +162,19 @@ Treat all external input (user input, API responses, file contents, environment 
 - Never construct queries, shell commands, or file paths via raw string concatenation of untrusted input — use parameterized queries, safe APIs, or proper escaping.
 - Never hardcode secrets, tokens, or credentials. Read them from environment variables or a secrets manager, and never log them.
 - Validate and sanitize input at trust boundaries (where external data enters the system), not just deep inside business logic.
+
+---
+
+## Performance
+
+Don't optimize prematurely. Before recommending or applying an optimization:
+- Identify the actual bottleneck — don't guess.
+- Estimate the real impact of fixing it.
+- Weigh the added complexity against that impact.
+
+Prefer algorithmic improvements (better data structure, fewer passes over the data) over micro-optimizations (loop unrolling, premature caching) — the former tends to matter more and cost less in readability.
+
+Default to writing code that's reasonably efficient without obsessing over it: avoid obviously wasteful patterns (quadratic behavior on data that can grow large, repeated work that could be cached or hoisted out of a loop, unnecessary copies of large data), but don't trade away readability for a speedup nobody asked for and nothing measured.
 
 ---
 

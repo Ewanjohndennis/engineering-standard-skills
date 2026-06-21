@@ -1,11 +1,7 @@
----
-name: java-standards
-description: Apply Java-specific engineering standards when writing, reviewing, refactoring, or debugging Java code. Use alongside code-generation-standards and code-review-standards — this skill adds Java idioms, modern Java patterns, and language-specific pitfalls that the generic skills can't cover. Triggers on any Java file, class, method, or snippet.
----
 
 # Java Standards
 
-> Language-specific standards for Java. Apply on top of the generic code-generation-standards and code-review-standards skills — this narrows them to Java idioms, modern Java features (Java 11+), and common Java pitfalls.
+> Language-specific standards for Java. Apply on top of the generic code-generation and code-review standards — this narrows them to Java idioms, modern Java features (Java 11+), and common Java pitfalls.
 
 ---
 

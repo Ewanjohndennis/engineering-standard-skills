@@ -1,13 +1,25 @@
----
-name: code-review-standards
-description: Apply rigorous, Google-style review standards when the user shares existing code, a diff, or a pull request and asks for feedback, a review, or "what's wrong with this." Use for explicit review requests — not for code Claude is generating fresh (see the code-generation-standards skill for that case). Flag issues with a short rationale, prioritized by severity, in a constructive tone.
----
 
 # Code Review Standards
 
 > Inspired by Google's [Engineering Practices documentation](https://google.github.io/eng-practices/) (CC-BY 3.0) and general production engineering norms. Not affiliated with or endorsed by Google. See README for details.
 
 When reviewing code the user shares, evaluate it against the standards below. Flag issues with a short explanation of *why* it matters, not just *what* is wrong. Prioritize substance over style.
+
+---
+
+## Priority order
+
+When two concerns about the same piece of code conflict — say, a fix would improve security but hurt readability, or a suggestion is "more correct" but inconsistent with the rest of the codebase — resolve it in this order when deciding what to flag as blocking versus a nit:
+
+1. **Correctness**
+2. **Security**
+3. **Existing codebase conventions**
+4. **Maintainability**
+5. **Readability**
+6. **Performance**
+7. **Style preferences**
+
+A correctness or security issue is blocking even if fixing it makes the code slightly less elegant. A style preference is never blocking, even if it's a real improvement — it's a nit, full stop.
 
 ---
 
@@ -23,13 +35,14 @@ The goal of a review is not perfection — it's continuous improvement. **Approv
 2. **Security** — untrusted input handled safely (no injection via raw string concatenation into queries/commands/paths), no hardcoded secrets, no secrets in logs.
 3. **Backward compatibility / blast radius** — does this change a public interface, shared module, or existing behavior in a way that could break other callers? Flag this even if the user didn't ask about it.
 4. **Resource and concurrency safety** — are files/connections/locks released deterministically? Any shared mutable state that could race?
-5. **Design** — single responsibility per function/class; no mixing of unrelated concerns; no premature abstraction.
-6. **Readability** — would another engineer understand this without the author explaining it? Overly clever code is a readability bug even if it's correct.
-7. **Naming** — does naming match the language's own convention and the rest of the codebase, and is it unambiguous?
-8. **Tests** — are the important cases (happy path, edge cases, error cases) covered? Do tests check behavior, not implementation details?
-9. **Error handling** — are errors handled explicitly, with specific types, and meaningful messages? Anything swallowed silently?
-10. **Code health** — duplication, unnecessary dependencies, leftover commented-out code, anything noticeably worse than the surrounding codebase.
-11. **Documentation** — if the change alters behavior, a public API, or how something is built/tested/released, does it also update the relevant docs, README, or docstrings? Missing documentation updates are a real gap, not a nit.
+5. **Performance** — anything that will clearly cause trouble at realistic scale: N+1 queries, quadratic behavior on data that can grow large, unbounded memory growth, blocking I/O inside an async/concurrent path. Don't flag theoretical micro-inefficiencies that don't matter in practice.
+6. **Design** — single responsibility per function/class; no mixing of unrelated concerns; no premature abstraction.
+7. **Readability** — would another engineer understand this without the author explaining it? Overly clever code is a readability bug even if it's correct.
+8. **Naming** — does naming match the language's own convention and the rest of the codebase, and is it unambiguous?
+9. **Tests** — are the important cases covered, roughly in this order of importance: critical business logic, edge cases, error paths, integration points, then happy paths? Do tests check behavior, not implementation details? Watch for snapshot-heavy tests that assert nothing meaningful, and over-mocked tests that only verify mocks were called.
+10. **Error handling** — are errors handled explicitly, with specific types, and meaningful messages? Anything swallowed silently?
+11. **Code health** — duplication, unnecessary dependencies, leftover commented-out code, anything noticeably worse than the surrounding codebase. Also flag unrelated, unrequested rewrites — refactoring for its own sake, bundled into a change that didn't need it, is a code-health problem too, not a bonus.
+12. **Documentation** — if the change alters behavior, a public API, or how something is built/tested/released, does it also update the relevant docs, README, or docstrings? Missing documentation updates are a real gap, not a nit.
 
 ---
 
@@ -39,12 +52,18 @@ Don't evaluate only the changed lines in isolation. Look at the surrounding code
 
 ---
 
+## Confidence in suggested fixes
+
+When recommending a fix that relies on a specific library function, API, or framework behavior, don't assert it from memory with more confidence than you actually have. If you're not certain a suggested method or parameter exists in the version being used, say so and recommend the author verify it, rather than handing back a confidently-worded fix built on a guess. A wrong suggestion stated as fact is worse than a right one stated with appropriate hedging.
+
+---
+
 ## How to flag issues
 
 Distinguish severity so the user can triage:
 
 - **Blocking** — correctness bugs, security issues, breaking changes to public interfaces. These should be fixed before the code ships.
-- **Should fix** — design issues, missing test coverage for real risk, error handling gaps, missing documentation updates for behavior changes.
+- **Should fix** — design issues, missing test coverage for real risk, error handling gaps, missing documentation updates for behavior changes, performance issues that will actually bite at realistic scale.
 - **Nit** — naming, minor style, comment wording. Worth mentioning but not worth blocking on. Label these explicitly as nits so they don't get conflated with real problems.
 
 For each issue, briefly state what's wrong and why it matters — not just a rule citation. "This will throw on empty input because `.split()` never returns an empty list" is more useful than "handle edge cases."
