@@ -36,7 +36,7 @@ If the language isn't one of these three, just apply the generic generation/revi
 If a single task spans multiple languages (e.g. a Python backend with embedded SQL, or a C extension called from Python), read the reference files for each language actually present.
 
 ---
-
+ 
 ## Priority order across all layers
 
 When guidance from different reference files conflicts, resolve it in this order:
